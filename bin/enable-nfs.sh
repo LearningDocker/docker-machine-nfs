@@ -92,7 +92,11 @@ function mount_nfs_volume {
 
     sudo nfsd update
 
-    $DOCKER_MACHINE ssh $docker_host "sudo umount $HOST_DIR 2> /dev/null"
+    local mounts=`$DOCKER_MACHINE ssh $docker_host "sudo mount" | grep $HOST_DIR`
+
+    if [ ! -z $mounts ]; then
+        $DOCKER_MACHINE ssh $docker_host "sudo umount $HOST_DIR 2> /dev/null"
+    fi
 
     $DOCKER_MACHINE ssh $docker_host "sudo mkdir -p $shared_dir"
     $DOCKER_MACHINE ssh $docker_host "sudo /usr/local/etc/init.d/nfs-client start"
